@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}相関出力結果{% endblock %}
+{% block content %}
+<a class="nav-link" href="/">戻る</a>
+<div class="card">
+    <div class="card-header">インデックス</div>
+    <div class="card-body" name="target_metrics_group">
+        {% for label in labelindex %}
+        <div class="row">
+            <p class="col-2">{{ label["id"] }}</p>
+            <p class="col-10">{{ label["label"] }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">相関係数</div>
+    <div class="card-body" name="target_metrics_group">
+        {{ result | safe }}
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">元データ(5件)</div>
+    <div class="card-body" name="target_metrics_group">
+        {{ src_data | safe }}
+    </div>
+</div>
+{% endblock %}

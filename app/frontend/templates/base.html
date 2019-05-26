@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="icon" href="{{url_for('static', filename='images/favicon.ico') }}">
+    <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" rel="stylesheet">
+    <link href="{{url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    <script>
+        // 一定時間で消えるメッセージを表示
+        function set_message(value, level = "info") {
+            $('[name="message"]').css("color", "");
+            $('[name="message"]').fadeIn(0);
+            $('[name="message"]').text(value);
+            if (level == "warning") {
+                $('[name="message"]').css("color", "Red");
+            }
+            $('[name="message"]').fadeOut(2000);
+            setTimeout(function () {
+                $('[name="message"]').text("");
+            }, 2000);
+        }
+
+        (function () {
+            // inputタグの時のみ、enter無効化
+            $("input").on("keydown", function (e) {
+                if ((e.which && e.which === 13) || (e.keyCode && e.keyCode === 13)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+        <a class="navbar-brand" href="/">corrcw</a>
+
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">相関分析 <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">データ</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">モデル</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://github.com/falco694/corrcloudwatch" target="_blank">
+                        <i class="fab fa-github"></i> Github
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <main role="main" class="container">
+        <div class="container">
+            <div class="message-box">
+                <label name="message"></label>
+            </div>
+        </div>
+        <div class="content-main">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+    </main><!-- /.container -->
+
+    <div class="container">
+        <footer>
+            <p>&copy;ふなっしー</p>
+        </footer>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous">
+    </script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous">
+    </script>
+    <script src="{{url_for('static', filename='js/javascript.js') }}"></script>
+</body>
+
+</html>

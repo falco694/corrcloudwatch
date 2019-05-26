@@ -1,0 +1,19 @@
+body {
+  padding-top: 4rem;
+}
+.content-main {
+  padding: 0.5rem 1.5rem;
+}
+
+div.message-box {
+	min-height: 35px;
+}
+
+.metrics{
+	width: 80%;
+	display: inline-block;
+}
+
+a.disabled{
+	pointer-events: none;
+}
