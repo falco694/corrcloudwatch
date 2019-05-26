@@ -17,3 +17,5 @@ def corr(data):
     """
     データの相関係数を出力
     """
+
+    return data.corr()

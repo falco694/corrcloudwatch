@@ -45,7 +45,7 @@ def index():
 
             metricDataQueries.append(
                 {
-                    'Id': "m" + tmp_metrics_id[index],
+                    'Id': tmp_metrics_id[index],
                     'Label': tmp_metrics[index],
                     'MetricStat': {
                         'Metric': {
@@ -73,7 +73,7 @@ def index():
             metrics_data_tmp = []
             labelindex.append(
                 {
-                    "id":item["Id"],
+                    "id": item["Id"],
                     "label": item["Label"]
                 }
             )
@@ -92,13 +92,15 @@ def index():
         try:
             for index in range(len(metrics_datas)):
                 if index > 0:
-                    marge_data = pd.merge(
-                        marge_data, metrics_datas[index], how="inner", on="Timestamps")
+                    marge_data = marge_data.merge(
+                        metrics_datas[index],
+                        how="inner",
+                        on="Timestamps")
                 else:
                     marge_data = metrics_datas[0]
 
             # 相関係数算出
-            corr_data = marge_data.corr()
+            corr_data = calc.corr(marge_data)
 
         except:
             return render_template(
@@ -110,25 +112,25 @@ def index():
             'corr_result.html',
             result=corr_data.to_html(),
             src_data=marge_data[0:5].to_html(),
-            labelindex = labelindex
+            labelindex=labelindex
         )
 
 
 @app.context_processor
 def override_url_for():
-    return dict(url_for = dated_url_for)
+    return dict(url_for=dated_url_for)
 
 
 def dated_url_for(endpoint, **values):
     if endpoint == 'static':
-        filename=values.get('filename', None)
+        filename = values.get('filename', None)
         if filename:
-            file_path=os.path.join(app.root_path,
+            file_path = os.path.join(app.root_path,
                                      endpoint, filename)
-            values['q']=int(os.stat(file_path).st_mtime)
+            values['q'] = int(os.stat(file_path).st_mtime)
     return url_for(endpoint, **values)
 
 
 if __name__ == '__main__':
-    app.debug=True
-    app.run(host = 'localhost', port = 5000)
+    app.debug = True
+    app.run(host='localhost', port=5000)

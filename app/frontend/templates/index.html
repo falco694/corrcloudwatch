@@ -41,9 +41,8 @@
         });
 
         var result_count = 0;
-        for(var i = items.length - 1; i >= 0; i--){
-            if(items[i].style.display == "")
-            {
+        for (var i = items.length - 1; i >= 0; i--) {
+            if (items[i].style.display == "") {
                 result_count++
             }
         }
@@ -126,7 +125,7 @@
 
     // 相関分析実行
     var run_corr = function () {
-        if ($('input[name="target_metrics"]').length == 0) {
+        if ($('input[name="target_metrics"]').length < 3) {
             set_message("3つ以上のメトリクスを選択してください", level = "warning");
             return false;
         }
@@ -202,6 +201,8 @@
         <div class="card-body" name="target_metrics_group">
         </div>
     </div>
-    <button type="submit" class="btn btn-primary" onclick="return run_corr();">相関分析</button>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary" onclick="return run_corr();">相関分析</button>
+    </div>
 </form>
 {% endblock %}
