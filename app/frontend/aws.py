@@ -1,3 +1,8 @@
+"""
+AWS全般のハンドリング
+https://boto3.amazonaws.com/v1/documentation/api/latest/index.html
+"""
+
 import boto3
 import datetime
 
@@ -14,7 +19,6 @@ def list_metrics():
 
 
 # TODO: 複数のメトリクスを同時に取得できるようにする
-# 1440ポイントは、時系列に対してからメトリクスごとにもカウントされるかは要確認
 # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/cloudwatch.html?highlight=cloudwatch#CloudWatch.Client.get_metric_data
 def get_metrics(metricDataQueries):
     """
