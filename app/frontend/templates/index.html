@@ -81,7 +81,7 @@
         // 現在の選択数
         var selected_count = $('input[name="target_metrics"]').length;
 
-        // 相関出力の差異のラベルとなるテキストを表示
+        // 相関出力の際のラベルとなるテキストを表示
         $('<input>', {
             id: `target_metrics_id_${selected_count}`,
             type: "text",
@@ -89,7 +89,7 @@
             value: `m${selected_count}`,
             class: "form-control",
             html: `m${selected_count}&nbsp;`,
-            style: "width: 6%;",
+            style: "width: 50px;",
             readonly: "readonly",
         }).appendTo('div[name="target_metrics_group"]');
 
@@ -125,9 +125,24 @@
 
     // 相関分析実行
     var run_corr = function () {
+        message = ""
         if ($('input[name="target_metrics"]').length < 3) {
-            set_message("3つ以上のメトリクスを選択してください", level = "warning");
-            return false;
+            message += "3つ以上のメトリクスを選択してください<br>"
+        };
+
+        if ($('input[name="start_datetime"]').val() == "" || $('input[name="end_datetime"]').val() == "")
+        {
+            message += "開始日時と終了日時どちらとも指定してください"
+        }
+
+        else if ($('input[name="start_datetime"]').val() >= $('input[name="end_datetime"]').val()){
+            message += "終了日時には開始日時より後を指定してください"
+        }
+
+        if(message != "")
+        {
+            set_message(message, level = "warning");
+            return false
         }
     };
 
@@ -159,12 +174,12 @@
     </div>
     <div class="form-group row">
         <div class="col">
-            <input type="datetime" class="form-control" name="start_datetime" placeholder="開始日時: YYYY-MM-DDThh:mm:ss"
-                title="工事中" disabled>
+                <label class="col-form-label">開始日時</label>
+                <input type="text" name="start_datetime" class="form-control" placeholder="YYYY-MM-DD HH:mm">
         </div>
         <div class="col">
-            <input type="datetime" class="form-control" name="end_datetime" placeholder="終了日時: YYYY-MM-DDThh:mm:ss"
-                title="工事中" disabled>
+            <label class="col-form-label">終了日時</label>
+            <input type="text" name="end_datetime" class="form-control" placeholder="YYYY-MM-DD HH:mm">
         </div>
     </div>
     <div class="form-group" name="select-metrics">
@@ -183,6 +198,12 @@
             <select class="form-control metrics" name="list_metrics">
                 <option>-----メトリクスを選択-----</option>
                 {% for item in list_metrics %}
+                { import os}
+                {% if not item['Dimensions']  %}
+                <option value="{{ item['Namespace'] }},{{ item['MetricName'] }}">
+                    {{ item['Namespace'] }},{{ item['MetricName'] }}
+                </option>
+                {% endif %}
                 {% for item_dim in item['Dimensions'] %}
                 <option
                     value="{{ item['Namespace'] }},{{ item['MetricName'] }},{{ item_dim['Name'] }}={{ item_dim['Value'] }}">
