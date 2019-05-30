@@ -15,16 +15,23 @@ def index():
 
     if request.method == "GET":
         list_metrics = aws.list_metrics()
-        return render_template('index.html',
-                               list_metrics=list_metrics,
-                               list_metrics_count=len(list_metrics)
-                               )
+        return render_template(
+            'index.html',
+            list_metrics=list_metrics,
+            list_metrics_count=len(list_metrics)
+        )
     else:
         metricDataQueries = []
 
         query = {}
         period = int(request.form["period"])
         statistics = str(request.form["statistics"])
+        start_datetime = datetime.datetime.strptime(
+            request.form["start_datetime"], '%Y-%m-%d %H:%M'
+        )
+        end_datetime = datetime.datetime.strptime(
+            request.form["end_datetime"], '%Y-%m-%d %H:%M'
+        )
         tmp_metrics_id = request.form.getlist("target_metrics_id")
         tmp_metrics = request.form.getlist("target_metrics")
 
@@ -43,55 +50,83 @@ def index():
                 name = tmp_metrics[index].split(",")[2].split("=")[0]
                 value = tmp_metrics[index].split(",")[2].split("=")[1]
 
-            metricDataQueries.append(
-                {
-                    'Id': tmp_metrics_id[index],
-                    'Label': tmp_metrics[index],
-                    'MetricStat': {
-                        'Metric': {
-                            'Namespace': namespace,
-                            'MetricName': metricName,
-                            'Dimensions': [
-                                {
-                                    'Name': name,
-                                    'Value': value
-                                },
-                            ]
-                        },
-                        'Period': period,
-                        'Stat': statistics,
-                    }
-                },
-            )
+            if len(tmp_metrics[index].split(",")) == 3:
+                metricDataQueries.append(
+                    {
+                        'Id': tmp_metrics_id[index],
+                        'Label': tmp_metrics[index],
+                        'MetricStat': {
+                            'Metric': {
+                                'Namespace': namespace,
+                                'MetricName': metricName,
+                                'Dimensions': [
+                                    {
+                                        'Name': name,
+                                        'Value': value
+                                    },
+                                ]
+                            },
+                            'Period': period,
+                            'Stat': statistics,
+                        }
+                    },
+                )
 
-        data = aws.get_metrics(metricDataQueries=metricDataQueries)
+            else:
+                metricDataQueries.append(
+                    {
+                        'Id': tmp_metrics_id[index],
+                        'Label': tmp_metrics[index],
+                        'MetricStat': {
+                            'Metric': {
+                                'Namespace': namespace,
+                                'MetricName': metricName,
+                            },
+                            'Period': period,
+                            'Stat': statistics,
+                        }
+                    },
+                )
+
+        data = aws.get_metrics(
+            metricDataQueries=metricDataQueries,
+            start_time=start_datetime,
+            end_time=end_datetime,
+        )
 
         metrics_datas = []
 
         labelindex = []
-        for item in data["MetricDataResults"]:
-            metrics_data_tmp = []
-            labelindex.append(
-                {
-                    "id": item["Id"],
-                    "label": item["Label"]
-                }
-            )
+        metrics_data_tmp = {}
+        for item in data:
+            if len(labelindex) < len(metricDataQueries):
+                labelindex.append(
+                    {
+                        "id": item["Id"],
+                        "label": item["Label"]
+                    }
+                )
+                metrics_data_tmp[item["Id"]] = []
             for index in range(len(item["Timestamps"])):
-                metrics_data_tmp.append(
+                metrics_data_tmp[item["Id"]].append(
                     {
                         "Timestamps": item["Timestamps"][index],
                         item["Id"]: item["Values"][index],
                     }
                 )
-            metrics_data = pd.DataFrame(metrics_data_tmp)
-            print(metrics_data)
+
+        for key in metrics_data_tmp:
+            metrics_data = pd.DataFrame(metrics_data_tmp[key])
             metrics_datas.append(metrics_data)
 
         marge_data = pd.DataFrame()
         try:
-            for index in range(len(metrics_datas)):
+            for index in range(len(labelindex)):
                 if index > 0:
+                    # on_columns = list(
+                    #     set(marge_data.columns) & set(
+                    #         metrics_datas[index].columns)
+                    # )
                     marge_data = marge_data.merge(
                         metrics_datas[index],
                         how="inner",
@@ -103,9 +138,11 @@ def index():
             corr_data = calc.corr(marge_data)
 
         except:
+            import traceback
+            error = traceback.format_exc()
             return render_template(
                 'corr_result.html',
-                result="<label>データが欠損しているなど</label>"
+                result="データが欠損しているなど<br>{}".format(error)
             )
 
         return render_template(
