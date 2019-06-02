@@ -82,15 +82,24 @@
         var selected_count = $('input[name="target_metrics"]').length;
 
         // 相関出力の際のラベルとなるテキストを表示
+        // ラベルの文字列を作成
+        var edit = metrics_val;
+        var metricName = edit.split(",")[1];
+        if (edit.split(",").length > 2) {
+            var Dimensions_name = edit.split(",")[2].split("=")[0];
+            var Dimensions_value = edit.split(",")[2].split("=")[1];
+            var labelstr = metricName + "_" + Dimensions_value;
+        } else {
+            var labelstr = metricName;
+        }
+
         $('<input>', {
-            id: `target_metrics_id_${selected_count}`,
+            id: `target_metrics_label_${selected_count}`,
             type: "text",
-            name: "target_metrics_id",
-            value: `m${selected_count}`,
-            class: "form-control",
-            html: `m${selected_count}&nbsp;`,
-            style: "width: 50px;",
-            readonly: "readonly",
+            name: "target_metrics_label",
+            value: `${labelstr}`,
+            class: "form-control metrics",
+            html: `${labelstr}&nbsp;`,
         }).appendTo('div[name="target_metrics_group"]');
 
         // テキストボックスにて選択したメトリクスを表示
@@ -118,7 +127,7 @@
     // メトリクス選択削除
     var del_metrics = function (value) {
         var index = value.id.split("_")[1];
-        $(`#target_metrics_id_${index}`).remove();
+        $(`#target_metrics_label_${index}`).remove();
         $(`#target_metrics_${index}`).remove();
         $(`#${value.id}`).remove();
     };
@@ -141,6 +150,41 @@
             return false
         }
     };
+
+    // 日付入力補助
+    function set_date(start, end) {
+        $('input[name="start_datetime"]').val(
+            start.format('YYYY-MM-DD HH:mm')
+        );
+        $('input[name="end_datetime"]').val(
+            end.format('YYYY-MM-DD HH:mm')
+        );
+    }
+
+    function set_relative_date(period) {
+
+        start = moment();
+        end = moment();
+        switch (period) {
+            case "days":
+                start = moment().add(-1, "days");
+                break;
+            case "week":
+                start = moment().add(-1, "week");
+                break;
+            case "month":
+                start = moment().add(-1, "month");
+                break;
+            case "years":
+                start = moment().add(-1, "years");
+                break;
+            default:
+                break;
+
+        }
+
+        set_date(start, end);
+    }
 
     (function () {});
 </script>
@@ -176,6 +220,15 @@
         <div class="col">
             <label class="col-form-label">終了日時</label>
             <input type="text" name="end_datetime" class="form-control" placeholder="YYYY-MM-DD HH:mm">
+        </div>
+        <div class="col">
+            <label class="col-form-label">相対値</label>
+            <div>
+                <button type="button" class="btn btn-outline-info" onclick="set_relative_date('days');">1日</button>
+                <button type="button" class="btn btn-outline-info" onclick="set_relative_date('week');">1週間</button>
+                <button type="button" class="btn btn-outline-info" onclick="set_relative_date('month');">1ヶ月</button>
+                <button type="button" class="btn btn-outline-info" onclick="set_relative_date('years');">1年</button>
+            </div>
         </div>
     </div>
     <div class="form-group" name="select-metrics">

@@ -4,25 +4,37 @@
 <a class="nav-link" href="/">戻る</a>
 <div class="card">
     <div class="card-header">インデックス</div>
-    <div class="card-body" name="target_metrics_group">
+    <div class="card-body">
         {% for label in labelindex %}
         <div class="row">
-            <p class="col-2">{{ label["id"] }}</p>
-            <p class="col-10">{{ label["label"] }}</p>
+            <p class="col-2">{{ label["Label"] }}</p>
+            <p class="col-10">{{ label["Metric"] }}</p>
         </div>
         {% endfor %}
     </div>
 </div>
 <div class="card">
     <div class="card-header">相関係数</div>
-    <div class="card-body" name="target_metrics_group">
+    <div class="card-body">
         {{ result | safe }}
     </div>
 </div>
 <div class="card">
+    <div class="card-header">散布図行列</div>
+    <img src="{{ url_for('static', filename='tmp/seaborn_pairplot.png') }}">
+</div>
+<div class="card">
     <div class="card-header">元データ(5件)</div>
-    <div class="card-body" name="target_metrics_group">
-        {{ src_data | safe }}
+    <div class="card-body">
+        {{ src_data_start | safe }}
+        <p>...</p>
+        {{ src_data_end | safe }}
+    </div>
+</div>
+<div class="card">
+    <div class="card-header">CSVデータ</div>
+    <div class="card-body">
+        <a href="download/result.csv" download="result.csv">ダウンロード</a>
     </div>
 </div>
 {% endblock %}

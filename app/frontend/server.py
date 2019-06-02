@@ -1,11 +1,14 @@
 import datetime
+import json
 import os
+import sys
 
 import pandas as pd
-from flask import Flask, render_template, request, url_for
+from flask import Flask, Response, render_template, request, url_for
 
 import aws
 import calc
+import misc
 
 app = Flask(__name__)
 
@@ -32,16 +35,8 @@ def index():
         end_datetime = datetime.datetime.strptime(
             request.form["end_datetime"], '%Y-%m-%d %H:%M'
         )
-        tmp_metrics_id = request.form.getlist("target_metrics_id")
+        tmp_metrics_label = request.form.getlist("target_metrics_label")
         tmp_metrics = request.form.getlist("target_metrics")
-
-        # i = 0
-        # for item in tmp_metrics:
-        #     namespace = item.split(",")[0]
-        #     metricName = item.split(",")[1]
-        #     if len(item.split(",")) == 3:
-        #         name = item.split(",")[2].split("=")[0]
-        #         value = item.split(",")[2].split("=")[1]
 
         for index in range(len(tmp_metrics)):
             namespace = tmp_metrics[index].split(",")[0]
@@ -53,8 +48,8 @@ def index():
             if len(tmp_metrics[index].split(",")) == 3:
                 metricDataQueries.append(
                     {
-                        'Id': tmp_metrics_id[index],
-                        'Label': tmp_metrics[index],
+                        'Id': "m{}".format(index),
+                        'Label': tmp_metrics_label[index],
                         'MetricStat': {
                             'Metric': {
                                 'Namespace': namespace,
@@ -75,8 +70,8 @@ def index():
             else:
                 metricDataQueries.append(
                     {
-                        'Id': tmp_metrics_id[index],
-                        'Label': tmp_metrics[index],
+                        'Id': "m{}".format(index),
+                        'Label': tmp_metrics_label[index],
                         'MetricStat': {
                             'Metric': {
                                 'Namespace': namespace,
@@ -102,16 +97,16 @@ def index():
             if len(labelindex) < len(metricDataQueries):
                 labelindex.append(
                     {
-                        "id": item["Id"],
-                        "label": item["Label"]
+                        "Label": item["Label"],
+                        "Metric": metricDataQueries[len(labelindex)]["MetricStat"]
                     }
                 )
-                metrics_data_tmp[item["Id"]] = []
+                metrics_data_tmp[item["Label"]] = []
             for index in range(len(item["Timestamps"])):
-                metrics_data_tmp[item["Id"]].append(
+                metrics_data_tmp[item["Label"]].append(
                     {
                         "Timestamps": item["Timestamps"][index],
-                        item["Id"]: item["Values"][index],
+                        item["Label"]: item["Values"][index],
                     }
                 )
 
@@ -119,38 +114,67 @@ def index():
             metrics_data = pd.DataFrame(metrics_data_tmp[key])
             metrics_datas.append(metrics_data)
 
-        marge_data = pd.DataFrame()
+        merge_data = pd.DataFrame()
         try:
             for index in range(len(labelindex)):
                 if index > 0:
-                    # on_columns = list(
-                    #     set(marge_data.columns) & set(
-                    #         metrics_datas[index].columns)
-                    # )
-                    marge_data = marge_data.merge(
+                    merge_data = merge_data.merge(
                         metrics_datas[index],
                         how="inner",
                         on="Timestamps")
                 else:
-                    marge_data = metrics_datas[0]
+                    merge_data = metrics_datas[0]
+
+            # Timestampsが先頭にない場合があるので、先頭にもってくる
+            columns = merge_data.columns.tolist()
+            columns.remove("Timestamps")
+            columns.insert(0, "Timestamps")
+            merge_data = merge_data.ix[:, columns]
 
             # 相関係数算出
-            corr_data = calc.corr(marge_data)
+            corr_data = calc.corr(merge_data)
+
+            # 散布図行列を出力
+            calc.pairplot(merge_data)
+
+            # csvダウンロードの準備
+            base = os.path.dirname(os.path.abspath(
+                __file__)).replace(os.sep, "/")
+            filename = "/static/tmp/result.csv"
+            fullpath = base + filename
+            merge_data.to_csv(fullpath)
 
         except:
             import traceback
             error = traceback.format_exc()
             return render_template(
                 'corr_result.html',
-                result="データが欠損しているなど<br>{}".format(error)
+                error=misc.str_to_html(error)
             )
 
         return render_template(
             'corr_result.html',
             result=corr_data.to_html(),
-            src_data=marge_data[0:5].to_html(),
+            src_data_start=merge_data[:5].to_html(),
+            src_data_end=merge_data[-10:].to_html(),
             labelindex=labelindex
         )
+
+
+@app.route('/download/<filename>', methods=["GET"])
+def download_file(filename):
+    base = os.path.dirname(os.path.abspath(
+        __file__)).replace(os.sep, "/")
+    subfolder = "/static/tmp/"
+    fullpath = base + subfolder + filename
+    with open(fullpath, 'r') as f:
+        file_contents = f.read()
+
+    return Response(
+        file_contents,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 "attachment; filename=" + filename})
 
 
 @app.context_processor
