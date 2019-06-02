@@ -130,17 +130,13 @@
             message += "3つ以上のメトリクスを選択してください<br>"
         };
 
-        if ($('input[name="start_datetime"]').val() == "" || $('input[name="end_datetime"]').val() == "")
-        {
+        if ($('input[name="start_datetime"]').val() == "" || $('input[name="end_datetime"]').val() == "") {
             message += "開始日時と終了日時どちらとも指定してください"
-        }
-
-        else if ($('input[name="start_datetime"]').val() >= $('input[name="end_datetime"]').val()){
+        } else if ($('input[name="start_datetime"]').val() >= $('input[name="end_datetime"]').val()) {
             message += "終了日時には開始日時より後を指定してください"
         }
 
-        if(message != "")
-        {
+        if (message != "") {
             set_message(message, level = "warning");
             return false
         }
@@ -174,8 +170,8 @@
     </div>
     <div class="form-group row">
         <div class="col">
-                <label class="col-form-label">開始日時</label>
-                <input type="text" name="start_datetime" class="form-control" placeholder="YYYY-MM-DD HH:mm">
+            <label class="col-form-label">開始日時</label>
+            <input type="text" name="start_datetime" class="form-control" placeholder="YYYY-MM-DD HH:mm">
         </div>
         <div class="col">
             <label class="col-form-label">終了日時</label>
@@ -195,7 +191,7 @@
         <button type="button" class="btn btn-outline-info" onclick="filter_metrics();"><i class="fa fa-filter"
                 aria-hidden="true"></i></button>
         <div class="form-group">
-            <select class="form-control metrics" name="list_metrics">
+            <select class="form-control metrics" name="list_metrics" autofocus>
                 <option>-----メトリクスを選択-----</option>
                 {% for item in list_metrics %}
                 { import os}
