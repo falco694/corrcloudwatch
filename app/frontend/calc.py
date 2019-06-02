@@ -1,21 +1,31 @@
-import pandas as pd
-
 import io
+import os
+
+import pandas as pd
 import requests
-# response_text = requests.get("https://raw.githubusercontent.com/pandas-dev/pandas/master/pandas/tests/data/iris.csv").text
-# df = pd.read_csv(io.StringIO(response_text))
+import seaborn as sns
 
-# 相関係数の計算 df.corr(method="pearson") でも結果は同様 デフォルト動作
-# df.corr()
-
-# from pandas.tools.plotting import scatter_matrix
-# pd.scatter_matrix(df) # 散布図行列を描く
-
-# plt.show() # 対話的に画像を表示する場合
 
 def corr(data):
     """
     データの相関係数を出力
     """
 
-    return data.corr()
+    return data.corr(method="pearson")
+
+
+def pairplot(data):
+    """
+    散布図行列の画像を作成し、パスを返す
+        :param data:行列データ
+    """
+
+    base = os.path.dirname(os.path.abspath(__file__)).replace(os.sep, "/")
+    filename = "/static/tmp/seaborn_pairplot.png"
+    fullpath = base + filename
+    if os.path.exists(fullpath):
+        os.remove(fullpath)
+    pg = sns.pairplot(data)
+    pg.savefig(fullpath)
+
+    return
