@@ -1,9 +1,12 @@
 import io
 import os
 
+import matplotlib
 import pandas as pd
 import requests
 import seaborn as sns
+
+matplotlib.use("TkAgg")
 
 
 def corr(data):
