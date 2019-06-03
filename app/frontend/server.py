@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import pickle
 import sys
 
 import pandas as pd
@@ -17,7 +18,20 @@ app = Flask(__name__)
 def index():
 
     if request.method == "GET":
-        list_metrics = aws.list_metrics()
+        list_metrics = []
+        base = os.path.dirname(os.path.abspath(__file__)).replace(os.sep, "/")
+        filename = "all_metrics_file.pickle"
+        all_metrics_file = base + "/static/tmp/" + filename
+        if os.path.exists(all_metrics_file):
+            with open(all_metrics_file, 'rb') as f:
+                list_metrics = pickle.load(f)
+                print("read metrics from pickle file.")
+        else:
+            list_metrics = aws.list_metrics()
+            with open(all_metrics_file, 'wb') as f:
+                pickle.dump(list_metrics, f)
+                print("get metrics from aws.")
+
         return render_template(
             'index.html',
             list_metrics=list_metrics,
@@ -163,6 +177,10 @@ def index():
 
 @app.route('/download/<filename>', methods=["GET"])
 def download_file(filename):
+    """
+    ファイルダウンロード
+        :param filename: ダウンロードする/static/tmp内のファイル名
+    """
     base = os.path.dirname(os.path.abspath(
         __file__)).replace(os.sep, "/")
     subfolder = "/static/tmp/"
@@ -175,6 +193,34 @@ def download_file(filename):
         mimetype="text/csv",
         headers={"Content-disposition":
                  "attachment; filename=" + filename})
+
+
+@app.route('/getlistmetrics', methods=["GET"])
+def get_list_metrics():
+    """
+    メトリクスを再取得します
+    """
+    base = os.path.dirname(os.path.abspath(
+        __file__)).replace(os.sep, "/")
+    subfolder = "/static/tmp/"
+    filename = "all_metrics_file.pickle"
+    fullpath = base + subfolder + filename
+
+    if os.path.exists(fullpath):
+        os.remove(fullpath)
+
+    list_metrics = aws.list_metrics()
+    with open(fullpath, 'wb') as f:
+        pickle.dump(list_metrics, f)
+    print("get metrics from aws.")
+
+    content = """<label>再取得しました</label>
+    <a class="nav-link" href="/">戻る</a>"""
+
+    return Response(
+        content,
+        mimetype="text/html"
+    )
 
 
 @app.context_processor
