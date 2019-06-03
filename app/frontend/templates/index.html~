@@ -247,6 +247,7 @@
             <select class="form-control metrics" name="list_metrics" autofocus>
                 <option>-----メトリクスを選択-----</option>
                 {% for item in list_metrics %}
+                { import os}
                 {% if not item['Dimensions']  %}
                 <option value="{{ item['Namespace'] }},{{ item['MetricName'] }}">
                     {{ item['Namespace'] }},{{ item['MetricName'] }}
