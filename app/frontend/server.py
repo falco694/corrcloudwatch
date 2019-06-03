@@ -5,7 +5,7 @@ import pickle
 import sys
 
 import pandas as pd
-from flask import Flask, Response, render_template, request, url_for
+from flask import Flask, redirect, Response, render_template, request, url_for
 
 import aws
 import calc
@@ -217,10 +217,7 @@ def get_list_metrics():
     content = """<label>再取得しました</label>
     <a class="nav-link" href="/">戻る</a>"""
 
-    return Response(
-        content,
-        mimetype="text/html"
-    )
+    return redirect("/")
 
 
 @app.context_processor
