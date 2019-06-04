@@ -6,6 +6,7 @@ Overview
 ## Description
 
 Calculate correlation of aws cloudwatch metrics.
+check with chrome.
 
 ## Demo
 
