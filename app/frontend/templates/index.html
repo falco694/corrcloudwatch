@@ -15,7 +15,6 @@
         if (values == "") {
             for (var i = items.length - 1; i >= 0; i--) {
                 items[i].style.display = "";
-                // items[i].selected = false;
                 set_message("メトリクスフィルターが選択されていません");
             }
             return;
@@ -31,7 +30,8 @@
 
         words.forEach(function (value) {
             var reg = new RegExp(".*" + value + ".*", "i");
-            for (var i = items.length - 1; i >= 0; i--) {
+            // 先頭の初期選択肢は常に表示する
+            for (var i = items.length - 1; i >= 1; i--) {
                 if (!items[i].textContent.match(reg)) {
                     items[i].style.display = "none";
                 }
@@ -48,7 +48,7 @@
         }
 
 
-        set_message(`検索ワード:${words}, ヒット数:${result_count}`);
+        set_message(`検索ワード:${words}, ヒット数:${result_count - 1}`);
     }
 
     // 選択したメトリクスを下に追加する
