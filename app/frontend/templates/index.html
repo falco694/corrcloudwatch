@@ -14,8 +14,9 @@
         var items = selectBox.children;
         if (values == "") {
             for (var i = items.length - 1; i >= 0; i--) {
-                items[i].style.display = "";
-                // items[i].selected = false;
+                if ($(items[i])[0].tagName == "SPAN") {
+                    $(items[i].children[0]).unwrap();
+                }
                 set_message("メトリクスフィルターが選択されていません");
             }
             return;
@@ -26,33 +27,37 @@
             return e !== "";
         });
         for (var i = items.length - 1; i >= 0; i--) {
-            items[i].style.display = "";
+            if ($(items[i])[0].tagName == "SPAN") {
+                $(items[i].children[0]).unwrap();
+            }
         }
 
         words.forEach(function (value) {
             var reg = new RegExp(".*" + value + ".*", "i");
-            for (var i = items.length - 1; i >= 0; i--) {
+            // 先頭の初期選択肢は常に表示する
+            for (var i = items.length - 1; i >= 1; i--) {
                 if (!items[i].textContent.match(reg)) {
-                    items[i].style.display = "none";
+                    if ($(items[i])[0].tagName == "OPTION") {
+                        $(items[i]).wrap("<span>");
+                    }
+                    items[i].selected = false;
                 }
-                items[i].selected = false;
+                selectBox.children[0].selected = true;
             }
-            selectBox.children[0].selected = true;
         });
 
         var result_count = 0;
         for (var i = items.length - 1; i >= 0; i--) {
-            if (items[i].style.display == "") {
+            if ($(items[i])[0].tagName == "OPTION") {
                 result_count++
             }
         }
 
-
-        set_message(`検索ワード:${words}, ヒット数:${result_count}`);
+        set_message(`検索ワード:${words}, ヒット数:${result_count - 1}`);
     }
 
     // 選択したメトリクスを下に追加する
-    var add_metrics = function () {
+    function add_metrics() {
 
         // 現在選択されているメトリクスの値を取得する
         var list_metrics = $('select[name="list_metrics"]');
@@ -66,15 +71,15 @@
         }
 
         // 既に選択されていた場合はアラート表示し、追加しない
-        var selectedMetrics = 0
+        var selected_metrics = false
         $('input[name="target_metrics"]').each(function () {
             if ($(this).val() == metrics_val) {
                 set_message("選択済みのメトリクスです");
-                selectedMetrics++
+                selected_metrics = true
             }
         });
 
-        if (selectedMetrics == 1) {
+        if (selected_metrics) {
             return;
         }
 
@@ -125,7 +130,7 @@
     }
 
     // メトリクス選択削除
-    var del_metrics = function (value) {
+    function del_metrics(value) {
         var index = value.id.split("_")[1];
         $(`#target_metrics_label_${index}`).remove();
         $(`#target_metrics_${index}`).remove();
@@ -133,7 +138,7 @@
     };
 
     // 相関分析実行
-    var run_corr = function () {
+    function run_corr() {
         message = ""
         if ($('input[name="target_metrics"]').length < 3) {
             message += "3つ以上のメトリクスを選択してください<br>"
