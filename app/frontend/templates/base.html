@@ -31,7 +31,9 @@
     <script src="{{url_for('static', filename='js/javascript.js') }}"></script>
     <script>
         // 一定時間で消えるメッセージを表示
-        function set_message(value, level = "info") {
+        function set_message(value, level) {
+            if(typeof level === 'undefined') level = "info";
+
             $('[name="message"]').css("color", "");
             $('[name="message"]').fadeIn(0);
             // $('[name="message"]').text(value);
