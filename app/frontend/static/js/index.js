@@ -86,7 +86,6 @@ function add_metrics() {
     var edit = metrics_val;
     var metricName = edit.split(",")[1];
     if (edit.split(",").length > 2) {
-        var Dimensions_name = edit.split(",")[2].split("=")[0];
         var Dimensions_value = edit.split(",")[2].split("=")[1];
         var labelstr = metricName + "_" + Dimensions_value;
     } else {
@@ -109,9 +108,22 @@ function add_metrics() {
         name: "target_metrics",
         value: `${metrics_val}`,
         class: "form-control metrics",
-        html: `m${selected_count}&nbsp;`,
         readonly: "readonly",
     }).appendTo('div[name="target_metrics_group"]');
+
+    // 統計選択を表示
+    var statistics_html = $('select[name="statistics"]').html();
+    var statistics_index = $('select[name="statistics"]').prop("selectedIndex");
+    $('<select>', {
+        id: `target_metrics_statistics_${selected_count}`,
+        name: "target_metrics_statistics",
+        class: "form-control statistics",
+        html: `${statistics_html}`,
+    }).appendTo('div[name="target_metrics_group"]');
+
+    $(`#target_metrics_statistics_${selected_count}`).prop(
+        "selectedIndex", `${statistics_index}`
+    );
 
     // マイナスボタンを作成
     $('<button>', {
@@ -149,6 +161,7 @@ function run_corr() {
 
     if (message != "") {
         set_message(message, level = "warning");
+        push_message(message)
         return false
     }
 };
@@ -188,4 +201,4 @@ function set_relative_date(period) {
     set_date(start, end);
 }
 
-(function () {});
+$(function () {});

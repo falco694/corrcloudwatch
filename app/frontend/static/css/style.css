@@ -17,3 +17,8 @@ div.message-box {
 a.disabled{
 	pointer-events: none;
 }
+
+.statistics{
+	width: 10%;
+	display: inline-block;
+}

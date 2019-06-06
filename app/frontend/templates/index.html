@@ -5,6 +5,17 @@
 <script src="{{url_for('static', filename='js/index.js') }}"></script>
 
 <form name="form-metrics" action="/" method="POST">
+    <div class="card">
+        <button id="last_select_display" type="button" class="btn btn-outline-info" data-toggle="collapse"
+                data-target="#last_select_metrics">前回値
+                <i class="far fa-caret-square-down"></i>
+            </button>
+        <div class="card-body collapse" id="last_select_metrics">
+            {% for item in select_metrics %}
+            <p>{{ item }}</p>
+            {% endfor %}
+        </div>
+    </div>
     <div class="form-group">
         <div class="row">
             <div class="col">
@@ -17,7 +28,7 @@
                 </select>
             </div>
             <div class="col">
-                <label class="col-form-label">統計</label>
+                <label class="col-form-label">統計(メトリクス事に指定可能)</label>
                 <select class="form-control" name="statistics" required>
                     <option value="Average">平均</option>
                     <option value="Maximum">最大</option>
