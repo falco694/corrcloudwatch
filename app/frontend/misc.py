@@ -1,4 +1,5 @@
 # etc
+import os
 
 
 def str_to_html(rawstr: str):
@@ -11,3 +12,13 @@ def str_to_html(rawstr: str):
     result = result.replace(" ", "&nbsp;")
 
     return result
+
+
+def get_filepath_tmp(filename):
+    """
+    /static/tmp/{filename}のフルパスを取得します
+        :param filename: ファイル名
+    """
+
+    base = os.path.dirname(os.path.abspath(__file__)).replace(os.sep, "/")
+    return base + "/static/tmp/" + filename

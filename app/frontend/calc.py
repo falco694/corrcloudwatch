@@ -6,6 +6,8 @@ import pandas as pd
 import requests
 import seaborn as sns
 
+import misc
+
 matplotlib.use("TkAgg")
 
 
@@ -23,9 +25,7 @@ def pairplot(data):
         :param data:行列データ
     """
 
-    base = os.path.dirname(os.path.abspath(__file__)).replace(os.sep, "/")
-    filename = "/static/tmp/seaborn_pairplot.png"
-    fullpath = base + filename
+    fullpath = misc.get_filepath_tmp("seaborn_pairplot.png")
     if os.path.exists(fullpath):
         os.remove(fullpath)
     pg = sns.pairplot(data)

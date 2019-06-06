@@ -5,7 +5,8 @@ import pickle
 import sys
 
 import pandas as pd
-from flask import Flask, redirect, Response, render_template, request, url_for, session
+from flask import (Flask, Response, redirect, render_template, request,
+                   session, url_for)
 
 import aws
 import calc
@@ -14,13 +15,12 @@ import misc
 app = Flask(__name__)
 app.secret_key = "vy9832hrifvhsdf9o2va9or9h3qjr"
 
+
 @app.route("/", methods=["GET"])
 def select_data():
 
     list_metrics = []
-    base = os.path.dirname(os.path.abspath(__file__)).replace(os.sep, "/")
-    filename = "all_metrics_file.pickle"
-    all_metrics_file = base + "/static/tmp/" + filename
+    all_metrics_file = misc.get_filepath_tmp("all_metrics_file.pickle")
     if os.path.exists(all_metrics_file):
         print("read metrics from pickle file.")
         with open(all_metrics_file, 'rb') as f:
@@ -161,10 +161,7 @@ def output_corr():
         calc.pairplot(merge_data)
 
         # csvダウンロードの準備
-        base = os.path.dirname(os.path.abspath(
-            __file__)).replace(os.sep, "/")
-        filename = "/static/tmp/result.csv"
-        fullpath = base + filename
+        fullpath = misc.get_filepath_tmp("result.csv")
         merge_data.to_csv(fullpath)
 
     except:
@@ -190,10 +187,7 @@ def download_file(filename):
     ファイルダウンロード
         :param filename: ダウンロードする/static/tmp内のファイル名
     """
-    base = os.path.dirname(os.path.abspath(
-        __file__)).replace(os.sep, "/")
-    subfolder = "/static/tmp/"
-    fullpath = base + subfolder + filename
+    fullpath = misc.get_filepath_tmp(filename)
     with open(fullpath, 'r') as f:
         file_contents = f.read()
 
@@ -209,11 +203,7 @@ def get_list_metrics():
     """
     メトリクスを再取得します
     """
-    base = os.path.dirname(os.path.abspath(
-        __file__)).replace(os.sep, "/")
-    subfolder = "/static/tmp/"
-    filename = "all_metrics_file.pickle"
-    fullpath = base + subfolder + filename
+    fullpath = misc.get_filepath_tmp("all_metrics_file.pickle")
 
     if os.path.exists(fullpath):
         os.remove(fullpath)
