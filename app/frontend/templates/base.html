@@ -28,36 +28,8 @@
     <script type="text/javascript"
         src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-datetimepicker/2.7.1/js/bootstrap-material-datetimepicker.min.js">
     </script>
-    <script src="{{url_for('static', filename='js/javascript.js') }}"></script>
-    <script>
-        // 一定時間で消えるメッセージを表示
-        function set_message(value, level) {
-            if(typeof level === 'undefined') level = "info";
-
-            $('[name="message"]').css("color", "");
-            $('[name="message"]').fadeIn(0);
-            // $('[name="message"]').text(value);
-            $('[name="message"]').html(value);
-            if (level == "warning") {
-                $('[name="message"]').css("color", "Red");
-            }
-            $('[name="message"]').fadeOut(2000);
-            setTimeout(function () {
-                $('[name="message"]').text("");
-            }, 2000);
-        }
-
-        (function () {
-            // inputタグの時のみ、enter無効化
-            $("input").on("keydown", function (e) {
-                if ((e.which && e.which === 13) || (e.keyCode && e.keyCode === 13)) {
-                    return false;
-                } else {
-                    return true;
-                }
-            });
-        });
-    </script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/push.js/1.0.7/push.min.js"></script>
+    <script src="{{url_for('static', filename='js/base.js') }}"></script>
 </head>
 
 <body>
@@ -86,11 +58,6 @@
     </nav>
 
     <main role="main" class="container">
-        <div class="container">
-            <div class="message-box">
-                <label name="message"></label>
-            </div>
-        </div>
         {% if error %}
         <div class="alert alert-danger" role="alert">
             {% autoescape False %}
@@ -107,7 +74,9 @@
 
     <div class="container">
         <footer>
-            <p>&copy;ふなっしー</p>
+            <div class="message-box">
+                <label name="message"></label>
+            </div>
         </footer>
     </div>
 </body>
