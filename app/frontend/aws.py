@@ -17,13 +17,15 @@ def list_metrics():
     result = []
     token = ''
 
+    print("start get list metrics.")
+
     # 初回取り込み
     response = cloudwatch.list_metrics()
     if "NextToken" in response:
         token = response["NextToken"]
 
     result.extend(response["Metrics"])
-    print("{}件取得".format(len(result)))
+    print("count:{}".format(len(result)))
 
     # 2回目以降
     while token is not '':
@@ -33,7 +35,9 @@ def list_metrics():
             token = response["NextToken"]
 
         result.extend(response["Metrics"])
-        print("{}件取得".format(len(result)))
+        print("count:{}".format(len(result)))
+
+    print("end get list metrics.")
 
     return result
 
@@ -59,6 +63,8 @@ def get_metrics(
     result = []
     token = ''
 
+    print("start get metric data.")
+
     # 初回取り込み
     response = cloudwatch.get_metric_data(
         MetricDataQueries=metricDataQueries,
@@ -72,9 +78,10 @@ def get_metrics(
         token = response["NextToken"]
 
     for index in range(len(response["MetricDataResults"])):
-        if len(response["MetricDataResults"][index]["Timestamps"]) != 0:
+        count = len(response["MetricDataResults"][index]["Timestamps"])
+        if count != 0:
             result.append(response["MetricDataResults"][index])
-            print(len(result))
+            print("count:{}".format(count))
 
     # 2回目以降
     while token is not '':
@@ -91,8 +98,11 @@ def get_metrics(
             token = response["NextToken"]
 
         for index in range(len(response["MetricDataResults"])):
-            if len(response["MetricDataResults"][index]["Timestamps"]) != 0:
+            count = len(response["MetricDataResults"][index]["Timestamps"])
+            if count != 0:
                 result.append(response["MetricDataResults"][index])
-                print(len(result))
+                print("count:{}".format(count))
+
+    print("end get metric data.")
 
     return result

@@ -23,14 +23,14 @@ def index():
         filename = "all_metrics_file.pickle"
         all_metrics_file = base + "/static/tmp/" + filename
         if os.path.exists(all_metrics_file):
+            print("read metrics from pickle file.")
             with open(all_metrics_file, 'rb') as f:
                 list_metrics = pickle.load(f)
-                print("read metrics from pickle file.")
         else:
+            print("get metrics from aws.")
             list_metrics = aws.list_metrics()
             with open(all_metrics_file, 'wb') as f:
                 pickle.dump(list_metrics, f)
-                print("get metrics from aws.")
 
         return render_template(
             'index.html',
