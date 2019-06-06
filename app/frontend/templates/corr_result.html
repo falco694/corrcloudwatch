@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}相関出力結果{% endblock %}
 {% block content %}
+<script src="{{url_for('static', filename='js/corr_result.js') }}"></script>
 <a class="nav-link" href="/">戻る</a>
 <div class="card">
     <div class="card-header">インデックス</div>
@@ -16,25 +17,53 @@
 <div class="card">
     <div class="card-header">相関係数</div>
     <div class="card-body">
-        {{ result | safe }}
+        <button type="button" class="btn btn-outline-info" data-toggle="collapse" data-target="#manual_corr">説明を見る
+            <i class="far fa-caret-square-down"></i>
+        </button>
+        <button type="button" class="btn btn-outline-info" onclick="set_color_corr();">色を付ける
+            <i class="fas fa-palette"></i>
+        </button>
+        <div class="collapse" id="manual_corr">
+            <p></p>
+            <table class="table">
+                <tr>
+                    <td>| r | = 0.7～1</td>
+                    <td>かなり強い相関がある(多重共線性も疑う)</td>
+                </tr>
+                <tr>
+                    <td>| r | = 0.4～0.7</td>
+                    <td>やや相関あり</td>
+                </tr>
+                <tr>
+                    <td>| r | = 0.2～0.4</td>
+                    <td>弱い相関あり</td>
+                </tr>
+                <tr>
+                    <td>| r | = 0～0.2</td>
+                    <td>ほとんど相関なし</td>
+                </tr>
+            </table>
+        </div>
+        <div class="card-body" id="corr_table_parent">
+            {{ result | safe }}
+        </div>
     </div>
-</div>
-<div class="card">
-    <div class="card-header">散布図行列</div>
-    <img src="{{ url_for('static', filename='tmp/seaborn_pairplot.png') }}">
-</div>
-<div class="card">
-    <div class="card-header">元データ(5件)</div>
-    <div class="card-body">
-        {{ src_data_start | safe }}
-        <p>...</p>
-        {{ src_data_end | safe }}
+    <div class="card">
+        <div class="card-header">散布図行列</div>
+        <img src="{{ url_for('static', filename='tmp/seaborn_pairplot.png') }}">
     </div>
-</div>
-<div class="card">
-    <div class="card-header">CSVデータ</div>
-    <div class="card-body">
-        <a href="download/result.csv" download="result.csv"> ダウンロード</a>
+    <div class="card">
+        <div class="card-header">元データ(5件)</div>
+        <div class="card-body">
+            {{ src_data_start | safe }}
+            <p>...</p>
+            {{ src_data_end | safe }}
+        </div>
     </div>
-</div>
-{% endblock %}
+    <div class="card">
+        <div class="card-header">CSVデータ</div>
+        <div class="card-body">
+            <a href="download/result.csv" download="result.csv"> ダウンロード</a>
+        </div>
+    </div>
+    {% endblock %}
