@@ -201,4 +201,11 @@ function set_relative_date(period) {
     set_date(start, end);
 }
 
+// プログレスバー値設定
+function set_progress(value)
+{
+    $("#progress").val(value);
+    $("#progress").html(value + "%");
+}
+
 $(function () {});
