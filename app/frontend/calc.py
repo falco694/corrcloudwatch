@@ -8,7 +8,10 @@ import seaborn as sns
 
 import misc
 
-matplotlib.use("TkAgg")
+import platform
+
+if platform.system() == "Darwin":
+    matplotlib.use("TkAgg")
 
 
 def corr(data):
