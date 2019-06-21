@@ -103,6 +103,6 @@ def get_metrics(
                 result.append(response["MetricDataResults"][index])
                 print("count:{}".format(count))
 
-    print("end get metric data.")
+    print("end get metric data.")typo
 
     return result
